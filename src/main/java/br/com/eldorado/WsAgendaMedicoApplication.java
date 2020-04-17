@@ -1,0 +1,14 @@
+package br.com.eldorado;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+
+@SpringBootApplication
+public class WsAgendaMedicoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(WsAgendaMedicoApplication.class, args);
+	}
+
+}
