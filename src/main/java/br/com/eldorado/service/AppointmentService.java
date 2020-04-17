@@ -22,6 +22,9 @@ import br.com.eldorado.dto.UserDTO;
 import br.com.eldorado.repository.AppointmentRepository;
 import br.com.eldorado.repository.DoctorRepository;
 import br.com.eldorado.repository.UserRepository;
+import br.com.eldorado.service.validators.AppointmentDoctorValidator;
+import br.com.eldorado.service.validators.AppointmentValidator;
+import br.com.eldorado.service.validators.DateValidator;
 import javassist.expr.NewArray;
 import net.bytebuddy.asm.Advice.Local;
 
@@ -38,55 +41,17 @@ public class AppointmentService {
 	UserRepository userRepo;
 
 	public ResponseEntity<?> create(Appointment appointment) {
-		Doctor doctor = null;
-		User user = null;
-		Boolean isValid = false;
-
-		if (appointment.getDoctor() != null)
-			doctor = docRepo.getOne(appointment.getDoctor().getId());
-
-		if (appointment.getUser() != null)
-			user = userRepo.getOne(appointment.getUser().getId());
-
-		if (doctor == null)
-			return new ResponseEntity(appointment, HttpStatus.BAD_REQUEST);
-
-		if (appointment.getDate().isBefore(LocalDateTime.now())) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("HORARIO JA PASSOU");
-		}
-
-		List<Appointment> appointmentList = appointRepo.findByDoctor(doctor);
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-		isValid = appointmentList.stream().anyMatch(appoint -> {
-			if (appoint.getDate().format(formatter).equals(appointment.getDate().format(formatter))
-					&& appoint.getDate().getHour() == appointment.getDate().getHour()) {
-				return true;
-			}
-			return false;
-
-		});
-
-		if (isValid == true) {
-			return new ResponseEntity(appointment, HttpStatus.BAD_REQUEST);
-		}
-
-		Appointment ap = new Appointment();
-		ap.setDoctor(doctor);
-		ap.setUser(user);
-		ap.setDate(appointment.getDate());
+		AppointmentValidator validator = new DateValidator(appointRepo);
+		validator.link(new AppointmentDoctorValidator(appointRepo));
+		validator.executaValidacao(appointment);
 		
 		try {
-			appointRepo.save(ap);			
+			appointRepo.save(appointment);
 		} catch (Exception e) {
-			e.printStackTrace();
-			// TODO: handle exception
+			throw new Error("Erro ao Criar a Consulta. Atualize a Pagina e tente Novamente");
 		}
 
-
-		return new ResponseEntity(new Message("Erro ao tentar marcar"), HttpStatus.BAD_REQUEST);
-
-//		return new ResponseEntity(new Message("Consulta Marcada com sucesso"), HttpStatus.ACCEPTED);
+		return new ResponseEntity(new Message("Consulta Marcada com sucesso"), HttpStatus.ACCEPTED);
 
 	}
 
