@@ -9,6 +9,7 @@ br/com/eldorado/controller/AvailableAppointmentController.class
 br/com/eldorado/domain/User.class
 br/com/eldorado/dto/SessionDTO.class
 br/com/eldorado/controller/AppointmentController.class
+br/com/eldorado/ServletInitializer.class
 br/com/eldorado/controller/SessionController.class
 br/com/eldorado/service/AvailableAppointmentService.class
 br/com/eldorado/dto/UserDTO.class

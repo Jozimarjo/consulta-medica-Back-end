@@ -1,6 +1,8 @@
 package br.com.eldorado.service.validators;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import br.com.eldorado.domain.Appointment;
 import br.com.eldorado.repository.AppointmentRepository;
@@ -14,7 +16,9 @@ public class DateValidator extends AppointmentValidator {
 
 	@Override
 	protected void valida(Appointment registro) {
-		if (registro.getDate().getMinute() > 0 || registro.getDate().isBefore(LocalDateTime.now())) {
+		ZonedDateTime zdtManaus = ZonedDateTime.now(ZoneId.of("America/Manaus"));
+
+		if (registro.getDate().getMinute() > 0 || registro.getDate().isBefore(zdtManaus.toLocalDateTime())) {
 			throw new Error("Data Invalida");
 
 		}
